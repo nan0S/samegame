@@ -1,0 +1,7 @@
+#!/bin/sh
+
+exename="samegame"
+testcase="$1"
+
+make
+./"$exename" < "tests/testcase$testcase.txt"
