@@ -60,6 +60,9 @@ echo -e "#pragma GCC target ("avx2")\n#pragma GCC optimization ("O3")\n#pragma G
 if [ -n "$debug" ]; then
 	echo adding debug
 	echo -e "#define DEBUG" >> $output
+else
+	echo adding ndebug
+	echo -e "#define NDEBUG" >> $output
 fi
 cat "${DEPS[@]}" >> $output # join all files into one
 sed -i -e '/HPP/d' -e '/include "/d' $output # remove define HPP guards and "*.hpp" includes

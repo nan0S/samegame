@@ -56,28 +56,29 @@ Action SameGame::chooseAction() {
 			state.getNeighbors(next, depth == 0);
 		}
 
-		if (!timer.isTimeLeft()) {
-			debug("Breaking loop because run out of time!");
+		if (!timer.isTimeLeft())
 			break;
-		}
 
 		assert(!next.empty());
 		beamSize = 0;
 		for (const auto& state : next)
 			beam[beamSize++] = state;
 
-		std::sort(beam.data(), beam.data() + beamSize, std::greater<State>());
-		for (int i = 0; i < beamSize - 1; ++i)
+		int considerCount = std::min(beamSize, BEAM_WIDTH);
+		std::partial_sort(
+			beam.data(),
+			beam.data() + considerCount,
+			beam.data() + beamSize,
+			std::greater<State>());
+		for (int i = 0; i < considerCount - 1; ++i)
 			assert(beam[i].score >= beam[i + 1].score);
 
 		next.clear();
-		if (beamSize > BEAM_WIDTH)
-			beamSize = BEAM_WIDTH;
+		beamSize = considerCount;
 	}
 
 	assert(beamSize > 0);
 	const auto& action = beam[0].firstAction;
-	debug(action);
 	assert(game.canPress(action.i, action.j));
 	return action;
 }

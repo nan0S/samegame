@@ -42,6 +42,7 @@ void State::apply(const Action& action) {
 	std::queue<Action> q;
 	q.push(action);
 	enqueued[i][j] = true;
+
 	int count = 0;
 
 	while (!q.empty()) {
