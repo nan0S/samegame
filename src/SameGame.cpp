@@ -7,6 +7,7 @@
 #include <algorithm>
 
 State SameGame::game;
+int SameGame::totalNextCount = 0;
 
 void SameGame::init() {
 	for (int i = State::N - 1; i >= 0; --i)
@@ -32,6 +33,7 @@ void SameGame::run() {
 		#endif
 	}
 	debug(game.score);
+	debug(totalNextCount);
 }
 
 #if 1
@@ -45,6 +47,7 @@ Action SameGame::chooseAction() {
 
 	int beamSize = 1;
 	beam[0] = game;
+	++totalNextCount;
 
 	int depth = 0;
 	float timeLimit = 49;
@@ -56,10 +59,11 @@ Action SameGame::chooseAction() {
 			state.getNeighbors(next, depth == 0);
 		}
 
-		if (!timer.isTimeLeft())
+		if (!timer.isTimeLeft() && depth > 0)
 			break;
 
 		assert(!next.empty());
+		totalNextCount += next.size();
 		beamSize = 0;
 		for (const auto& state : next)
 			beam[beamSize++] = state;
@@ -79,6 +83,7 @@ Action SameGame::chooseAction() {
 
 	assert(beamSize > 0);
 	const auto& action = beam[0].firstAction;
+	debug(action);
 	assert(game.canPress(action.i, action.j));
 	return action;
 }

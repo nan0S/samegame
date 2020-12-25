@@ -14,6 +14,7 @@ private:
 
 private:
 	static State game;
+  static int totalNextCount;
 	static constexpr int BEAM_WIDTH = 100;
 };
 

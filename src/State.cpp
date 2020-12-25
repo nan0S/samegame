@@ -44,10 +44,20 @@ void State::apply(const Action& action) {
 	enqueued[i][j] = true;
 
 	int count = 0;
+	int left = i, right = i;
+	int down = j, up = j;
 
 	while (!q.empty()) {
 		const auto [i, j] = q.front();
 		q.pop();
+
+		if (i < left) left = i;
+		else if (i > right) right = i;
+		if (j < down) down = j;
+		else if (j > up) up = j;
+
+		assert(left <= i && i <= right);
+		assert(down <= j && j <= up);
 
 		const auto color = board[i][j];
 		for (int k = 0; k < DIRC; ++k) {
@@ -68,24 +78,47 @@ void State::apply(const Action& action) {
 	assert(count > 1);
 	score += (count - 2) * (count - 2);
 
-	propagate();
+	propagate(left, right, down, up);
 
 	// empty reward
 	if (terminal())
 		score += 1000;
 }
 
-void State::propagate() {
-	propagateVertically();
-	propagateHorizontally();
+void State::propagate(const int left, const int right,
+					  const int down, const int up) {
+	int emptyColumnsMask = propagateVertically(left, right, down, up);
+	propagateHorizontally(left, right, emptyColumnsMask);
 }
 
-void State::propagateVertically() {
-	for (int j = 0; j < N; ++j) {
+int State::propagateVertically(const int left, const int right,
+								const int down, const int up) {
+	assert(N <= sizeof(int) * 8);
+	assert(left <= right);
+	assert(0 <= left && left < N);
+	assert(0 <= right && right < N);
+	assert(down <= up);
+	assert(0 <= down && down < N);
+	assert(0 <= up && up < N);
+
+	int emptyColumnsMask = down != 0 ?
+		0 : ((1 << (right + 1)) - 1) ^ ((1 << left) -  1);
+
+	if (down == 0) {
+		for (int i = 0; i < N; ++i)
+			if (left <= i && i <= right)
+				assert(emptyColumnsMask & 1 << i);
+			else
+				assert(!(emptyColumnsMask & 1 << i));
+	}
+
+	for (int j = left; j <= right; ++j) {
 		color_t* column = board[j];
-		for (int i = 0, it = 1; i < N - 1; ++i) {
-			if (column[i] != EMPTY)
+		for (int i = down, it = down + 1; i < N - 1; ++i) {
+			if (column[i] != EMPTY) {
+				emptyColumnsMask &= ~(1 << j);
 				continue;
+			}
 			if (it <= i)
 				it = i + 1;
 			while (it < N && column[it] == EMPTY)
@@ -93,7 +126,7 @@ void State::propagateVertically() {
 			assert(it <= N);
 			if (it == N)
 				break;
-
+			emptyColumnsMask &= ~(1 << j);
 			assert(column[i] == EMPTY &&
 				column[it] != EMPTY && 
 				i < it);
@@ -104,16 +137,27 @@ void State::propagateVertically() {
 	#ifdef DEBUG
 	assert(isVerticallyCorrect());
 	#endif
+
+	return emptyColumnsMask;
 }
 
-void State::propagateHorizontally() {
-	auto isEmpty = [this](const int& j){
-		return std::all_of(board[j], board[j] + N, [](const color_t& c){
-			return c == EMPTY;
-		});
+void State::propagateHorizontally(const int left, const int right,
+								  int emptyColumnsMask) {
+	assert(left <= right);
+	assert(0 <= left && left < N);
+	assert(0 <= right && right < N);
+
+	auto isEmpty = [&emptyColumnsMask](const int& j){
+		return emptyColumnsMask & 1 << j;
 	};
 
-	for (int j = 0, jt = 1; j < N - 1; ++j) {
+	for (int i = left; i <= right; ++i)
+		if (isEmpty(i))
+			assert(emptyColumnsMask & 1 << i);
+		else
+			assert(!(emptyColumnsMask & 1 << i));
+
+	for (int j = left, jt = left + 1; j < N - 1; ++j) {
 		if (!isEmpty(j))
 			continue;
 		if (jt <= j)
@@ -130,6 +174,8 @@ void State::propagateHorizontally() {
 
 		for (int i = 0; i < N; ++i)
 			std::swap(board[j][i], board[jt][i]);
+		emptyColumnsMask ^= 1 << j;
+		emptyColumnsMask ^= 1 << jt;
 	}
 
 	#ifdef DEBUG

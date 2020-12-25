@@ -24,9 +24,12 @@ struct State {
 	bool canPress(const int& i, const int& j) const;
 	bool inBounds(const int& i, const int& j) const;
 	void apply(const Action& action);
-	void propagate();
-	void propagateVertically();
-	void propagateHorizontally();
+	void propagate(const int left, const int right,
+				   const int down, const int up);
+	int propagateVertically(const int left, const int right,
+							 const int down, const int up);
+	void propagateHorizontally(const int left, const int right,
+							   int emptyColumnsMask);
 	int getNeighbors(std::unordered_set<State>& neighbors,
 		bool firstLayer) const;
 
