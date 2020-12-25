@@ -41,30 +41,27 @@ Action SameGame::chooseAction() {
 	static constexpr int STATES = State::MAX_NEIGHBORS * BEAM_WIDTH;
 	static std::array<State, STATES> beam;
 	static std::unordered_set<State> next;
+	next.clear();
+
 	int beamSize = 1;
 	beam[0] = game;
 
 	int depth = 0;
-	float timeLimit = 45;
+	float timeLimit = 49;
 
 	for (Timer timer(timeLimit); timer.isTimeLeft(); ++depth) {
 		assert(beamSize > 0);
-		for (int i = 0; i < beamSize; ++i) {
+		for (int i = 0; i < beamSize && timer.isTimeLeft(); ++i) {
 			const auto& state = beam[i];
 			state.getNeighbors(next, depth == 0);
 		}
 
-		// if (!timer.isTimeLeft()) {
-			// debug("Too little time left, exiting prematurely!");
-			// next.clear();
-			// break;
-		// }
-
-		if (next.empty()) {
-			debug("Breaking loop because everything is empty!");
+		if (!timer.isTimeLeft()) {
+			debug("Breaking loop because run out of time!");
 			break;
 		}
 
+		assert(!next.empty());
 		beamSize = 0;
 		for (const auto& state : next)
 			beam[beamSize++] = state;
@@ -76,12 +73,11 @@ Action SameGame::chooseAction() {
 		next.clear();
 		if (beamSize > BEAM_WIDTH)
 			beamSize = BEAM_WIDTH;
-		++depth;
 	}
 
 	assert(beamSize > 0);
-
 	const auto& action = beam[0].firstAction;
+	debug(action);
 	assert(game.canPress(action.i, action.j));
 	return action;
 }
@@ -109,6 +105,7 @@ Action SameGame::chooseAction() {
 	return bestAction;
 }
 #endif
+
 #if 0
 // take first greedy but with sorting
 Action SameGame::chooseAction() {
@@ -150,6 +147,7 @@ Action SameGame::chooseAction() {
 	return next[0].firstAction;
 }
 #endif
+
 #if 0
 // take first greedy but with sorting with unordered_set
 Action SameGame::chooseAction() {

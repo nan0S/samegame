@@ -17,4 +17,18 @@
 
 	\maketitle
 	
+	\section{Project Proposal}
+	Project proposal was already sent by me on SKOS - I am in group with Szymon Kosakowski and Kacper Szufnarowski.
+	
+	\section{SameGame Easy}
+	In order to get at least $6500$ points from the SameGame puzzle I have just written random agent - pick any legal action and perform it.
+	
+	\section{SameGame Medium}
+	In order to get at least $30000$ points from the SameGame puzzle I have written BeamSearch algorithm with no additional enhancements - $50ms$ for every round (including the first one despite $20s$ limit, search did not use any state). To be more exact, I got something around $30500$ points. I have used beam width equal to $100$.
+	
+	\section{Zobrist Hashing}
+	With state hashing I have achieved score of about $38000$ ($37900$ to be exact) - every state was hashed depending on the position of individual tiles. Better score is understandable as with the SameGame, we can get to one state with a different sequence of moves - especially on some levels and especially at the beginning, which could lead to duplicate states in our search, which will lead to worse search effectiveness.
+	
+	\section{Selective Policy}
+	
 \end{document}

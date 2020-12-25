@@ -1,3 +1,7 @@
 *.o
 raport.zip
 TODO
+*.log
+*.aux
+*synctex.gz
+*.out

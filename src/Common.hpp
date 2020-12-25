@@ -53,7 +53,7 @@ void _debug(const char* s, const Args&... rest) {
 
 #define debug(...) _debug(#__VA_ARGS__, __VA_ARGS__)
 #else
-#define debug(...) 13
+#define debug(...)
 #endif
 
 class Timer {

@@ -175,10 +175,12 @@ int State::getNeighbors(std::unordered_set<State>& neighbors, bool firstLayer) c
 		for (int j = 0; j < N; ++j)
 			if (!visited[i][j] && canPress(i, j)) {
 				floodfill(i, j);
+
 				auto neighbor = *this;
 				neighbor.apply({i, j});
 				if (firstLayer)
 					neighbor.firstAction = {i, j};
+
 				auto [it, inserted] = neighbors.insert(neighbor);
 				neighborCount += inserted;
 			}
@@ -224,22 +226,24 @@ bool State::isHorizontallyCorrect() const {
 
 std::ostream& operator<<(std::ostream& out, const State& state) {
 	static const char* colors[] = {
-		"\033[0m",
-		"\033[31m",
-		"\033[32m",
-		"\033[34m",
-		"\033[33m",
-		"\033[35m",
+		"\033[0m",  /* RESET */
+		"\033[31m", /* RED */
+		"\033[32m", /* GREEN */
+		"\033[34m", /* BLUE */
+		"\033[33m", /* YELLOW */
+		"\033[35m", /* PURPLE */
 	};
-	static const char* *cols = colors + 1;
+	static const char* block = "\u25A0";
 
-	out << "\n";
+	out << "\n\t  ";
+	for (int i = 0; i < state.N; ++i)
+		out << i % 10 << " ";
+	out << '\n';
 	for (int i = state.N - 1; i >= 0; --i) {
+		out << '\t' << i % 10 << " ";
 		for (int j = 0; j < state.N; ++j) {
 			const auto& c = state.board[j][i];
-			out << cols[c];
-			out << (c < 0 ? "" : " ") << c << " ";
-			out << cols[state.EMPTY];
+			out << colors[c + 1] << block << " " <<  colors[0];
 		}
 		out << "\n";
 	}
@@ -251,7 +255,6 @@ bool State::operator>(const State& state) const {
 }
 
 bool State::operator==(const State& state) const {
-	return false;
 	if (score != state.score)
 		return false;
 	for (int i = 0; i < N; ++i)
