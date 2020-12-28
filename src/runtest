@@ -1,7 +1,53 @@
 #!/bin/sh
 
-exename="samegame"
-testcase="$1"
+SCRIPT_NAME="runtest"
+VERSION="1.0"
+OPTS=$(getopt -o ahv \
+    --long all \
+    --long help \
+    --long version \
+    -- "$@")
+eval set -- "$OPTS"
 
-make
-./"$exename" < "tests/testcase$testcase.txt"
+while true
+do
+    case "$1" in
+        -a|--all)
+            all=1;;
+        -h|--help)
+            echo -e "Usage: $SCRIPT_NAME [OPTION]...\n"
+            echo -e "Run SameGame tests."
+            echo "List of possible options:"
+            echo -e "\t-a, --all\ttest on all available test cases"
+            echo -e "\t-h, --help\tprint this help"
+            echo -e "\t-v, --version\tshow version info"
+            exit;;
+        -v|--version)
+            echo "$SCRIPT_NAME (script) $VERSION"
+            echo "Written by Hubert Obrzut"
+            exit;;
+        --) shift; break;;
+    esac
+    shift
+done
+
+exename="samegame"
+testdir="tests"
+
+if [ -n "$all" ]; then
+    echo "Running all the tests!"
+    for testfile in $testdir/*.txt; do
+        ./"$exename" < $testfile 
+        echo $testfile
+    done 
+else
+    [ $# = 1 ] || {
+        echo "ERROR: usage: $SCRIPT_NAME [OPTIONS...] [TESTCASE]" 1>&2
+        exit 1
+    }
+    testcase="$1"
+    echo "Running $testcase test!"
+    make
+    ./"$exename" < "tests/testcase$testcase.txt"
+fi
+

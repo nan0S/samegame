@@ -16,7 +16,7 @@ Action BeamSearch::chooseAction(const State& game) {
     ++totalNextCount;
 
     int depth = 0;
-    float timeLimit = 49;
+    float timeLimit = 48;
 
     for (Timer timer(timeLimit); timer.isTimeLeft(); ++depth) {
         assert(beamSize > 0);

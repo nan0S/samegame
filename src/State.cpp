@@ -85,12 +85,12 @@ void State::apply(const Action& action) {
 	assert(count > 1);
 	score += (count - 2) * (count - 2);
 	if (tabooColor)
-		score -= 3000;
+		score -= 300;
 
 	propagate(left, right, down, up);
 
 	// empty reward
-	if (terminal())
+	if (empty())
 		score += 1000;
 }
 
@@ -190,6 +190,14 @@ void State::propagateHorizontally(const int left, const int right,
 	#ifdef DEBUG
 	assert(isHorizontallyCorrect());
 	#endif
+}
+
+bool State::empty() const {
+	for (int i = 0; i < N; ++i)
+		for (int j = 0; j < N; ++j)
+			if (board[i][j] != EMPTY)
+				return false;
+	return true;
 }
 
 int State::getNeighbors(std::unordered_set<State>& neighbors, bool firstLayer) const {
@@ -317,6 +325,7 @@ std::ostream& operator<<(std::ostream& out, const State& state) {
 		}
 		out << "\n";
 	}
+	out << "score: " << state.score << "\n";
 	return out;
 }
 

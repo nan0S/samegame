@@ -31,6 +31,7 @@ struct State {
 							 const int down, const int up);
 	void propagateHorizontally(const int left, const int right,
 							   int emptyColumnsMask);
+	bool empty() const;
 	int getNeighbors(std::unordered_set<State>& neighbors,
 		bool firstLayer) const;
 	color_t getTaboo() const;
