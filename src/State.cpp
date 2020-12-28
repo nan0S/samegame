@@ -50,6 +50,7 @@ void State::apply(const Action& action) {
 	enqueued[i][j] = true;
 
 	int count = 0;
+	bool tabooColor = board[i][j] == getTaboo();
 	int left = i, right = i;
 	int down = j, up = j;
 
@@ -83,6 +84,8 @@ void State::apply(const Action& action) {
 
 	assert(count > 1);
 	score += (count - 2) * (count - 2);
+	if (tabooColor)
+		score -= 3000;
 
 	propagate(left, right, down, up);
 
@@ -223,12 +226,10 @@ int State::getNeighbors(std::unordered_set<State>& neighbors, bool firstLayer) c
 		}
 	};
 
-	auto tabooColor = getTaboo();
 	int neighborCount = 0;
-
 	for (int i = 0; i < N; ++i)
 		for (int j = 0; j < N; ++j)
-			if (!visited[i][j] && board[i][j] != tabooColor && canPress(i, j)) {
+			if (!visited[i][j] && canPress(i, j)) {
 				floodfill(i, j);
 
 				auto neighbor = *this;
@@ -239,23 +240,6 @@ int State::getNeighbors(std::unordered_set<State>& neighbors, bool firstLayer) c
 				auto [it, inserted] = neighbors.insert(neighbor);
 				neighborCount += inserted;
 			}
-
-	if (neighborCount == 0) {
-		for (int i = 0; i < N; ++i)
-			for (int j = 0; j < N; ++j)
-				if (!visited[i][j] && canPress(i, j)) {
-					assert(board[i][j] == tabooColor);
-					floodfill(i, j);
-
-					auto neighbor = *this;
-					neighbor.apply({i, j});
-					if (firstLayer)
-						neighbor.firstAction = {i, j};
-
-					auto [it, inserted] = neighbors.insert(neighbor);
-					neighborCount += inserted;
-				}
-	}
 
 	if (neighborCount == 0)
 		neighborCount = neighbors.insert(*this).second;
