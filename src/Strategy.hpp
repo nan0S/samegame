@@ -7,6 +7,7 @@
 class Strategy {
 public:
     virtual Action chooseAction(const State& game) = 0;
+    virtual void end() const = 0;
     virtual ~Strategy() = default;
 
 protected:

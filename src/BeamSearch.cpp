@@ -53,3 +53,7 @@ Action BeamSearch::chooseAction(const State& game) {
     assert(game.canPress(action.i, action.j));
     return action;
 }
+
+void BeamSearch::end() const {
+    debug(totalNextCount);
+}

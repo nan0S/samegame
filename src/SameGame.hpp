@@ -30,7 +30,7 @@ public:
             #endif
         }
 
-        debug(game.score);
+        strategy->end();
         delete strategy;
     }
 

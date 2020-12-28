@@ -6,6 +6,7 @@
 class BeamSearch : public Strategy {
 public:
     Action chooseAction(const State& game) override;
+    void end() const override;
 
 private:
     static constexpr int BEAM_WIDTH = 100;
