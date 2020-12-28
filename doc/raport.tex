@@ -17,6 +17,8 @@
 
 	\maketitle
 	
+	\texttt{CodinGame handle:} \textbf{nan0S\_}
+	
 	\section{Project Proposal}
 	Project proposal was already sent by me on SKOS - I am in group with Szymon Kosakowski and Kacper Szufnarowski.
 	
@@ -30,5 +32,6 @@
 	With state hashing I have achieved score of about $38000$ ($37900$ to be exact) - every state was hashed depending on the position of individual tiles. Better score is understandable as with the SameGame, we can get to one state with a different sequence of moves - especially on some levels and especially at the beginning, which could lead to duplicate states in our search, which will lead to worse search effectiveness.
 	
 	\section{Selective Policy}
+	With color taboo policy I have managed to achieved score about $50700$ - I have just added punishment to the current score, if I have decided to press on the most frequent color. This improved the score by aggregating the most frequent color into larger blocks and pressing on then only at the end.
 	
 \end{document}
