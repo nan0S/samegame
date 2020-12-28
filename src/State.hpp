@@ -20,6 +20,7 @@ struct State {
 	int score = 0;
 	Action firstAction;
 
+	void init();
 	bool terminal() const;
 	bool canPress(const int& i, const int& j) const;
 	bool inBounds(const int& i, const int& j) const;
@@ -32,6 +33,7 @@ struct State {
 							   int emptyColumnsMask);
 	int getNeighbors(std::unordered_set<State>& neighbors,
 		bool firstLayer) const;
+	color_t getTaboo() const;
 
 	#ifdef DEBUG
 	bool isVerticallyCorrect() const;

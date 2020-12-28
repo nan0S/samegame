@@ -5,6 +5,12 @@
 #include <queue>
 #include <algorithm>
 
+void State::init() {
+	for (int i = State::N - 1; i >= 0; --i)
+		for (int j = 0; j < State::N; ++j)
+			std::cin >> board[j][i];
+}
+
 bool State::terminal() const {
 	for (int i = 0; i < N; ++i)
 		for (int j = 0; j < N; ++j)
@@ -217,10 +223,12 @@ int State::getNeighbors(std::unordered_set<State>& neighbors, bool firstLayer) c
 		}
 	};
 
+	auto tabooColor = getTaboo();
 	int neighborCount = 0;
+
 	for (int i = 0; i < N; ++i)
 		for (int j = 0; j < N; ++j)
-			if (!visited[i][j] && canPress(i, j)) {
+			if (!visited[i][j] && board[i][j] != tabooColor && canPress(i, j)) {
 				floodfill(i, j);
 
 				auto neighbor = *this;
@@ -232,10 +240,41 @@ int State::getNeighbors(std::unordered_set<State>& neighbors, bool firstLayer) c
 				neighborCount += inserted;
 			}
 
+	if (neighborCount == 0) {
+		for (int i = 0; i < N; ++i)
+			for (int j = 0; j < N; ++j)
+				if (!visited[i][j] && canPress(i, j)) {
+					assert(board[i][j] == tabooColor);
+					floodfill(i, j);
+
+					auto neighbor = *this;
+					neighbor.apply({i, j});
+					if (firstLayer)
+						neighbor.firstAction = {i, j};
+
+					auto [it, inserted] = neighbors.insert(neighbor);
+					neighborCount += inserted;
+				}
+	}
+
 	if (neighborCount == 0)
 		neighborCount = neighbors.insert(*this).second;
 
 	return neighborCount;
+}
+
+State::color_t State::getTaboo() const {
+	static int colorCount[5];
+	std::fill(colorCount, colorCount + 5, 0);
+	for (int i = 0; i < N; ++i)
+		for (int j = 0; j < N; ++j) {
+			const auto c = board[i][j];
+			if (c != EMPTY) {
+				assert(0 <= c && c < 5);
+				++colorCount[c];
+			}
+		}
+	return std::max_element(colorCount, colorCount + 5) - colorCount;
 }
 
 #ifdef DEBUG

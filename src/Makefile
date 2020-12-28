@@ -1,10 +1,10 @@
 TARGET = samegame
 
 OBJS = main.o \
-	SameGame.o \
 	State.o \
 	Common.o \
-	Action.o
+	Action.o \
+	BeamSearch.o
 
 CXX = g++
 CXXFLAGS = -std=c++17 -DLOCAL -Wall -Wextra -Wreorder -Ofast -O3 -flto -march=native -s

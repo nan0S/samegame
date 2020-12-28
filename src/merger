@@ -40,14 +40,20 @@ DEPS=(
 	Action.cpp
 	State.hpp
 	State.cpp
+	Strategy.hpp
+	BeamSearch.hpp
+	BeamSearch.cpp
 	SameGame.hpp
-	SameGame.cpp
 	main.cpp
 )
 
 # append newline at the end of every file, if there is none
 # in order for concatenation to work properly (cat)
 for file in "${DEPS[@]}"; do
+	[ -e "$file" ] || {
+		echo -e "ERROR: $file does not exists!" 1>&2
+		exit 1
+	}
 	[[ $(tail -c1 "$file") && -f "$file" ]] && echo '' >> "$file"
 done
 
