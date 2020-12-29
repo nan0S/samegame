@@ -219,45 +219,45 @@ int State::getNeighbors(Info* infos) const {
 	static bool visited[N][N];
 	std::memset(visited, 0, sizeof(visited));
 
-	auto floodfill = [this](const int& i, const int& j){
-		assert(!visited[i][j]);
-		assert(canPress(i, j));
+	// auto floodfill = [this](const int& i, const int& j){
+	// 	assert(!visited[i][j]);
+	// 	assert(canPress(i, j));
 
-		std::queue<Action> q;
-		q.push({i, j});
-		visited[i][j] = true;
-		int count = 0;
-		const auto color = board[i][j];
+	// 	std::queue<Action> q;
+	// 	q.push({i, j});
+	// 	visited[i][j] = true;
+	// 	int count = 0;
+	// 	const auto color = board[i][j];
 
-		while (!q.empty()) {
-			const auto [i, j] = q.front();
-			q.pop();
-			++count;
+	// 	while (!q.empty()) {
+	// 		const auto [i, j] = q.front();
+	// 		q.pop();
+	// 		++count;
 
-			assert(color == board[i][j]);
-			assert(visited[i][j]);
+	// 		assert(color == board[i][j]);
+	// 		assert(visited[i][j]);
 
-			for (int k = 0; k < DIRC; ++k) {
-				int ni = i + dx[k];
-				int nj = j + dy[k];
-				if (!inBounds(ni, nj) || visited[ni][nj])
-					continue;
-				if (color != board[ni][nj])
-					continue;
+	// 		for (int k = 0; k < DIRC; ++k) {
+	// 			int ni = i + dx[k];
+	// 			int nj = j + dy[k];
+	// 			if (!inBounds(ni, nj) || visited[ni][nj])
+	// 				continue;
+	// 			if (color != board[ni][nj])
+	// 				continue;
 
-				q.push({ni, nj});
-				visited[ni][nj] = true;
-			}
-		}
+	// 			q.push({ni, nj});
+	// 			visited[ni][nj] = true;
+	// 		}
+	// 	}
 
-		return count;
-	};
+	// 	return count;
+	// };
 
 	int neighborCount = 0;
 	for (int i = 0; i < N; ++i)
 		for (int j = 0; j < N; ++j)
 			if (!visited[i][j] && canPress(i, j)) {
-				int count = floodfill(i, j);
+				int count = floodfill(i, j, visited);
 				assert(count > 1);
 
 				auto& info = infos[neighborCount++];
@@ -272,6 +272,40 @@ int State::getNeighbors(Info* infos) const {
 	return neighborCount;
 }
 
+int State::floodfill(const int i, const int j, bool visited[N][N]) const {
+	assert(!visited[i][j]);
+	assert(canPress(i, j));
+
+	std::queue<Action> q;
+	q.push({i, j});
+	visited[i][j] = true;
+	int count = 0;
+	const auto color = board[i][j];
+
+	while (!q.empty()) {
+		const auto [i, j] = q.front();
+		q.pop();
+		++count;
+
+		assert(color == board[i][j]);
+		assert(visited[i][j]);
+
+		for (int k = 0; k < DIRC; ++k) {
+			int ni = i + dx[k];
+			int nj = j + dy[k];
+			if (!inBounds(ni, nj) || visited[ni][nj])
+				continue;
+			if (color != board[ni][nj])
+				continue;
+
+			q.push({ni, nj});
+			visited[ni][nj] = true;
+		}
+	}
+
+	return count;
+};
+
 State::color_t State::getTaboo() const {
 	static int colorCount[5];
 	std::fill(colorCount, colorCount + 5, 0);
@@ -284,6 +318,21 @@ State::color_t State::getTaboo() const {
 			}
 		}
 	return std::max_element(colorCount, colorCount + 5) - colorCount;
+}
+
+State::Sequence State::getActions() const {
+	static bool visited[N][N];
+	std::memset(visited, 0, sizeof(visited));
+
+	Sequence actions;
+	for (int i = 0; i < N; ++i)
+		for (int j = 0; j < N; ++j)
+			if (!visited[i][j] && canPress(i, j)) {
+				actions.push_back({i, j});
+				floodfill(i, j, visited);
+			}
+			
+	return actions;
 }
 
 #ifdef DEBUG

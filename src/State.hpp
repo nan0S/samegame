@@ -5,6 +5,7 @@
 #include "Common.hpp"
 #include <iostream>
 #include <unordered_set>
+#include <vector>
 
 struct State;
 
@@ -19,12 +20,13 @@ struct Info {
 
 struct State {
 	using color_t = short;
+	using Sequence = std::vector<Action>;
 	static constexpr color_t EMPTY = -1;
 
 	static constexpr int N = 15;
 	static constexpr int DIRC = 4;
-	static constexpr int dx[] = {0, 1, 0, -1};
-	static constexpr int dy[] = {1, 0, -1, 0};
+	static constexpr int dx[DIRC] = {0, 1, 0, -1};
+	static constexpr int dy[DIRC] = {1, 0, -1, 0};
 	static constexpr int MAX_NEIGHBORS = N * N / 2;
 
 	color_t board[N][N];
@@ -45,7 +47,9 @@ struct State {
 							   int emptyColumnsMask);
 	bool empty() const;
 	int getNeighbors(Info* infos) const;
+	int floodfill(const int i, const int j, bool visited[N][N]) const;
 	color_t getTaboo() const;
+	Sequence getActions() const;
 
 	#ifdef DEBUG
 	bool isVerticallyCorrect() const;

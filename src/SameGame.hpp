@@ -13,6 +13,7 @@ public:
 
 	static void run() {
         strategy = new StrategyT();
+        strategy->init(game);
 
         while (!game.terminal()) {
             Action action = strategy->chooseAction(game);

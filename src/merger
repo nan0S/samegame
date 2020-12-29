@@ -41,8 +41,11 @@ DEPS=(
 	State.hpp
 	State.cpp
 	Strategy.hpp
+	Strategy.cpp
 	BeamSearch.hpp
 	BeamSearch.cpp
+	NMCS.hpp
+	NMCS.cpp
 	SameGame.hpp
 	main.cpp
 )
