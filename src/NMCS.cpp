@@ -4,17 +4,6 @@
 #include <unistd.h>
 #include <cassert>
 
-// std::ostream& operator<<(std::ostream& out, const NMCS::Sequence& sequence) {
-//     for (const auto& x : sequence)
-//         out << "(" << x << ") ";
-//     return out;
-// }
-
-// std::ostream& operator<<(std::ostream& out, const NMCS::Result& result) {
-//     out << "score: " << result.first << "\n";
-//     return out << "sequence: " << result.second;
-// }
-
 void NMCS::init(const State& game) {
 }
 
