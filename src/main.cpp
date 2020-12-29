@@ -5,8 +5,8 @@
 int main() {
     std::ios_base::sync_with_stdio(false);
     
-    // using StrategyT = BeamSearch;
-    using StrategyT = NMCS;
+    using StrategyT = BeamSearch;
+    // using StrategyT = NMCS;
 
 	SameGame<StrategyT>::init();
 	SameGame<StrategyT>::run();

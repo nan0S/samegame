@@ -1,10 +1,9 @@
-                // if (board[i][j] == getTaboo())
 #include "BeamSearch.hpp"
 
 #include <cassert>
 #include <algorithm>
 
-Action BeamSearch::chooseAction(const State& game, float) {
+Action BeamSearch::chooseAction(const State& game, float timeLimit) {
     assert(!game.terminal());
 
     static constexpr int INFOS = State::MAX_NEIGHBORS * BEAM_WIDTH;
@@ -19,9 +18,8 @@ Action BeamSearch::chooseAction(const State& game, float) {
     ++totalNextCount;
 
     int depth = 0;
-    float tle = 48;
 
-    for (Timer timer(tle); timer.isTimeLeft(); ++depth) {
+    for (Timer timer(timeLimit); timer.isTimeLeft(); ++depth) {
         assert(beamSize > 0);
         for (int i = 0; i < beamSize && timer.isTimeLeft(); ++i) {
             const auto& state = beam[i];
@@ -58,10 +56,12 @@ Action BeamSearch::chooseAction(const State& game, float) {
     const auto& bestState = *std::max_element(beam, beam + beamSize, [](const State& s1, const State& s2){
         return s1.realscore < s2.realscore;
     });
+
     const auto& bestAction = bestState.firstAction;
     debug(bestState.realscore);
     debug(bestAction);
     assert(game.canPress(bestAction.i, bestAction.j));
+
     return bestAction;
 }
 

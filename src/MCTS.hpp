@@ -5,10 +5,8 @@
 
 class MCTS : public Strategy {
 public:
-    Action chooseAction(const State& game) override;
+    Action chooseAction(const State& state, float timeLimit) override; 
     void end() const override;
-
-private:
 };
-
+    
 #endif /* MCTS_HPP */

@@ -4,9 +4,6 @@
 #include <unistd.h>
 #include <cassert>
 
-void NMCS::init(const State& game) {
-}
-
 NMCS::Result NMCS::nested(State state, int level) {
     assert(level >= 0);
     if (level == 0)

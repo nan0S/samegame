@@ -33,6 +33,8 @@ public:
             #endif
         }
 
+        debug(roundCount);
+
         strategy->end();
         delete strategy;
     }
