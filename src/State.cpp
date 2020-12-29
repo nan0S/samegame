@@ -5,6 +5,14 @@
 #include <queue>
 #include <algorithm>
 
+bool Info::operator>(const Info& info) const {
+	return score > info.score;
+}
+
+std::ostream& operator<<(std::ostream& out, const Info& info) {
+	return out << "score=" << info.score << ", action=" << info.action;
+}
+
 void State::init() {
 	for (int i = State::N - 1; i >= 0; --i)
 		for (int j = 0; j < State::N; ++j)
@@ -40,6 +48,10 @@ bool State::inBounds(const int& i, const int& j) const {
 
 void State::apply(const Action& action) {
 	const auto& [i, j] = action;
+	if (!canPress(i, j)) {
+		debug(*this);
+		debug(action);
+	}
 	assert(canPress(i, j));
 
 	static bool enqueued[N][N];
@@ -84,14 +96,17 @@ void State::apply(const Action& action) {
 
 	assert(count > 1);
 	score += (count - 2) * (count - 2);
+	realscore += (count - 2) * (count - 2);
 	if (tabooColor)
-		score -= 300;
+		score -= 10000;
 
 	propagate(left, right, down, up);
 
 	// empty reward
-	if (empty())
+	if (empty()) {
 		score += 1000;
+		realscore += 1000;
+	}
 }
 
 void State::propagate(const int left, const int right,
@@ -200,7 +215,7 @@ bool State::empty() const {
 	return true;
 }
 
-int State::getNeighbors(std::unordered_set<State>& neighbors, bool firstLayer) const {
+int State::getNeighbors(Info* infos) const {
 	static bool visited[N][N];
 	std::memset(visited, 0, sizeof(visited));
 
@@ -211,11 +226,13 @@ int State::getNeighbors(std::unordered_set<State>& neighbors, bool firstLayer) c
 		std::queue<Action> q;
 		q.push({i, j});
 		visited[i][j] = true;
+		int count = 0;
 		const auto color = board[i][j];
 
 		while (!q.empty()) {
 			const auto [i, j] = q.front();
 			q.pop();
+			++count;
 
 			assert(color == board[i][j]);
 			assert(visited[i][j]);
@@ -232,25 +249,25 @@ int State::getNeighbors(std::unordered_set<State>& neighbors, bool firstLayer) c
 				visited[ni][nj] = true;
 			}
 		}
+
+		return count;
 	};
 
 	int neighborCount = 0;
 	for (int i = 0; i < N; ++i)
 		for (int j = 0; j < N; ++j)
 			if (!visited[i][j] && canPress(i, j)) {
-				floodfill(i, j);
+				int count = floodfill(i, j);
+				assert(count > 1);
 
-				auto neighbor = *this;
-				neighbor.apply({i, j});
-				if (firstLayer)
-					neighbor.firstAction = {i, j};
-
-				auto [it, inserted] = neighbors.insert(neighbor);
-				neighborCount += inserted;
+				auto& info = infos[neighborCount++];
+				info.action = {i, j};
+				info.score = score + (count - 2) * (count - 2);
+				info.state = this;
 			}
 
 	if (neighborCount == 0)
-		neighborCount = neighbors.insert(*this).second;
+		infos[neighborCount++] = { {-1, -1}, score, this };
 
 	return neighborCount;
 }
@@ -326,6 +343,7 @@ std::ostream& operator<<(std::ostream& out, const State& state) {
 		out << "\n";
 	}
 	out << "score: " << state.score << "\n";
+	out << "realscore: " << state.realscore << "\n";
 	return out;
 }
 

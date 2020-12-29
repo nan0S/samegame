@@ -6,6 +6,17 @@
 #include <iostream>
 #include <unordered_set>
 
+struct State;
+
+struct Info {
+	Action action;
+	int score;
+	const State* state;
+
+	bool operator>(const Info& info) const;
+	friend std::ostream& operator<<(std::ostream& out, const Info& info);
+};
+
 struct State {
 	using color_t = short;
 	static constexpr color_t EMPTY = -1;
@@ -18,6 +29,7 @@ struct State {
 
 	color_t board[N][N];
 	int score = 0;
+	int realscore = 0;
 	Action firstAction;
 
 	void init();
@@ -32,8 +44,7 @@ struct State {
 	void propagateHorizontally(const int left, const int right,
 							   int emptyColumnsMask);
 	bool empty() const;
-	int getNeighbors(std::unordered_set<State>& neighbors,
-		bool firstLayer) const;
+	int getNeighbors(Info* infos) const;
 	color_t getTaboo() const;
 
 	#ifdef DEBUG

@@ -1,3 +1,4 @@
+                // if (board[i][j] == getTaboo())
 #include "BeamSearch.hpp"
 
 #include <cassert>
@@ -6,12 +7,14 @@
 Action BeamSearch::chooseAction(const State& game) {
     assert(!game.terminal());
 
-    static constexpr int STATES = State::MAX_NEIGHBORS * BEAM_WIDTH;
-    static std::array<State, STATES> beam;
-    static std::unordered_set<State> next;
-    next.clear();
+    static constexpr int INFOS = State::MAX_NEIGHBORS * BEAM_WIDTH;
+    static State beam[BEAM_WIDTH];
+    static State next[BEAM_WIDTH];
+    static Info infos[INFOS];
+    static std::unordered_set<State> visited;
 
     int beamSize = 1;
+    int infoSize = 0;
     beam[0] = game;
     ++totalNextCount;
 
@@ -22,36 +25,44 @@ Action BeamSearch::chooseAction(const State& game) {
         assert(beamSize > 0);
         for (int i = 0; i < beamSize && timer.isTimeLeft(); ++i) {
             const auto& state = beam[i];
-            state.getNeighbors(next, depth == 0);
+            infoSize += state.getNeighbors(infos + infoSize);
         }
 
         if (!timer.isTimeLeft() && depth > 0)
             break;
 
-        assert(!next.empty());
-        totalNextCount += next.size();
+        assert(infoSize > 0);
+        std::sort(infos, infos + infoSize, std::greater<Info>());
         beamSize = 0;
-        for (const auto& state : next)
-            beam[beamSize++] = state;
 
-        int considerCount = std::min(beamSize, BEAM_WIDTH);
-        std::partial_sort(
-            beam.data(),
-            beam.data() + considerCount,
-            beam.data() + beamSize,
-            std::greater<State>());
-        for (int i = 0; i < considerCount - 1; ++i)
-            assert(beam[i].score >= beam[i + 1].score);
+        for (int i = 0; i < infoSize && beamSize < BEAM_WIDTH; ++i) {
+            const auto& info = infos[i];
+            next[beamSize] = *info.state;
+            auto& state = next[beamSize];
 
-        next.clear();
-        beamSize = considerCount;
+            if (info.action.i != -1)
+                state.apply(info.action);
+            if (depth == 0)
+                state.firstAction = info.action;
+            if (visited.insert(state).second)
+                beamSize++;
+        }
+
+        visited.clear();
+        totalNextCount += infoSize;
+        infoSize = 0;
+        std::swap(next, beam);
     }
 
-    assert(beamSize > 0);
-    const auto& action = beam[0].firstAction;
-    debug(action);
-    assert(game.canPress(action.i, action.j));
-    return action;
+    assert(beamSize > 0 && depth > 0);
+    const auto& bestState = *std::max_element(beam, beam + beamSize, [](const State& s1, const State& s2){
+        return s1.realscore < s2.realscore;
+    });
+    const auto& bestAction = bestState.firstAction;
+    debug(bestState.realscore);
+    debug(bestAction);
+    assert(game.canPress(bestAction.i, bestAction.j));
+    return bestAction;
 }
 
 void BeamSearch::end() const {
