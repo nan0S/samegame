@@ -34,4 +34,7 @@
 	\section{Selective Policy}
 	With color taboo policy I have managed to achieved score about $50700$ - I have just added punishment to the current score, if I have decided to press on the most frequent color. This improved the score by aggregating the most frequent color into larger blocks and pressing on then only at the end.
 	
+	\section{Nested Monte Carlo Search}
+	Nested Monte Carlo Search is very costly, but it has proved to be able to find very good solutions. After a few experiments I have decided to run NMCS with depth equal to $2$. I have written NMCS to run in the time constrained manner - I have used $20s$ limit in the first round and $50ms$ in the rest of the rounds (running NMCS for $50ms$ improved just a little bit, $20s$ in the first round was the main part). With pure NMCS I have managed to get the score around $66000$. When I have added color taboo policy I got $107000$ points - when calculating possible moves, I did not consider moves removing the most frequent color as long as a had other moves to do. As we can see this had a major impact on the efficiency of the algorithm. I wanted to deepen the search to $3$, but unfortunately $20s$ was too little time to find meaningful solutions - although better solutions were found, which was not the case with Beam Search - extending time limit did not have such significant impact on the quality of solutions.
+	
 \end{document}

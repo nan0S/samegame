@@ -4,7 +4,7 @@
 #include <cassert>
 #include <algorithm>
 
-Action BeamSearch::chooseAction(const State& game) {
+Action BeamSearch::chooseAction(const State& game, float) {
     assert(!game.terminal());
 
     static constexpr int INFOS = State::MAX_NEIGHBORS * BEAM_WIDTH;
@@ -19,9 +19,9 @@ Action BeamSearch::chooseAction(const State& game) {
     ++totalNextCount;
 
     int depth = 0;
-    float timeLimit = 48;
+    float tle = 48;
 
-    for (Timer timer(timeLimit); timer.isTimeLeft(); ++depth) {
+    for (Timer timer(tle); timer.isTimeLeft(); ++depth) {
         assert(beamSize > 0);
         for (int i = 0; i < beamSize && timer.isTimeLeft(); ++i) {
             const auto& state = beam[i];

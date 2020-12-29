@@ -324,14 +324,25 @@ State::Sequence State::getActions() const {
 	static bool visited[N][N];
 	std::memset(visited, 0, sizeof(visited));
 
+	const auto tabooColor = getTaboo();
+
 	Sequence actions;
 	for (int i = 0; i < N; ++i)
 		for (int j = 0; j < N; ++j)
-			if (!visited[i][j] && canPress(i, j)) {
+			if (!visited[i][j] && board[i][j] != tabooColor && canPress(i, j)) {
 				actions.push_back({i, j});
 				floodfill(i, j, visited);
 			}
-			
+
+	if (actions.empty())
+		for (int i = 0; i < N; ++i)
+			for (int j = 0; j < N; ++j)
+				if (!visited[i][j] && canPress(i, j)) {
+					assert(board[i][j] == tabooColor);
+					actions.push_back({i, j});
+					floodfill(i, j, visited);
+				}
+
 	return actions;
 }
 

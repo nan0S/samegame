@@ -15,8 +15,10 @@ public:
         strategy = new StrategyT();
         strategy->init(game);
 
+        int roundCount = 0;
         while (!game.terminal()) {
-            Action action = strategy->chooseAction(game);
+            Action action = strategy->chooseAction(game,
+                roundCount++ == 0 ? 19900 : 48);
             std::cout << action << std::endl;
             game.apply(action);
             debug(game);

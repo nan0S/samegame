@@ -5,7 +5,7 @@
 
 class BeamSearch : public Strategy {
 public:
-    Action chooseAction(const State& game) override;
+    Action chooseAction(const State& game, float timeLimit) override;
     void end() const override;
 
 private:

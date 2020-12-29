@@ -61,26 +61,15 @@ public:
     using time_t = float;
     using clock_t = std::chrono::high_resolution_clock;
 
+    Timer() = default;
     Timer(time_t timeLimit);
+    void set(float timeLimit);
     bool isTimeLeft() const;
+    void reset();
 
 private:
     time_t timeLimit;
     clock_t::time_point start;
-};
-
-class Stoper {
-public:
-    using time_t = float;
-    using clock_t = std::chrono::high_resolution_clock;
-
-    Stoper(time_t timeLimit);
-    void start();
-    bool isTimeLeft() const;
-
-private:
-    time_t timeLimit;
-    clock_t::time_point startTime;
 };
 
 #endif /* COMMON_HPP */

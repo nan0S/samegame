@@ -2,36 +2,20 @@
 
 #include <cassert>
 #include <unistd.h>
+#include <cassert>
 
-std::ostream& operator<<(std::ostream& out, const NMCS::Sequence& sequence) {
-    for (const auto& x : sequence)
-        out << "(" << x << ") ";
-    return out;
-}
+// std::ostream& operator<<(std::ostream& out, const NMCS::Sequence& sequence) {
+//     for (const auto& x : sequence)
+//         out << "(" << x << ") ";
+//     return out;
+// }
 
-std::ostream& operator<<(std::ostream& out, const NMCS::Result& result) {
-    out << "score: " << result.first << "\n";
-    return out << "sequence: " << result.second;
-}
-
-NMCS::NMCS() : stoper(19900) {
-
-}
+// std::ostream& operator<<(std::ostream& out, const NMCS::Result& result) {
+//     out << "score: " << result.first << "\n";
+//     return out << "sequence: " << result.second;
+// }
 
 void NMCS::init(const State& game) {
-
-    stoper.start();
-    Result bestResult = {-1, {}};
-
-    while (stoper.isTimeLeft()) {
-        auto result = nested(game, LEVEL);
-        if (result.first > bestResult.first)
-            bestResult = result;
-        break;
-    }
-
-    bestSequence = bestResult.second;
-    debug(bestResult.first);
 }
 
 NMCS::Result NMCS::nested(State state, int level) {
@@ -39,10 +23,10 @@ NMCS::Result NMCS::nested(State state, int level) {
     if (level == 0)
         return sample(state);
 
-    Result bestResult = {-1, {}};
+    Result bestResult = sample(state);
     Sequence visitedNodes;
 
-    while (!state.terminal() && stoper.isTimeLeft()) {
+    while (!state.terminal() && timer.isTimeLeft()) {
         Result currentResult = {-1, {}};
         Action currentBestAction = {-1, -1};
 
@@ -54,15 +38,18 @@ NMCS::Result NMCS::nested(State state, int level) {
                 currentBestAction = action;
                 currentResult = result;
             }
+            if (!timer.isTimeLeft())
+                break;
         }
 
-        if (currentResult.first >= bestResult.first) {
+        if (currentResult.first > bestResult.first) {
             visitedNodes.push_back(currentBestAction);
             bestResult = currentResult;
             bestResult.second.insert(bestResult.second.begin(),
                 visitedNodes.begin(), visitedNodes.end());
         }
         else {
+            assert(bestResult.second.size() > visitedNodes.size());
             currentBestAction = bestResult.second[visitedNodes.size()];
             visitedNodes.push_back(currentBestAction);
         }
@@ -78,6 +65,7 @@ NMCS::Result NMCS::sample(State state) {
 
     while (!state.terminal()) {
         auto actions = state.getActions();
+        assert(!actions.empty());
         const auto& action = actions[rand() % actions.size()];
         state.apply(action);
         sequence.push_back(action);
@@ -86,10 +74,22 @@ NMCS::Result NMCS::sample(State state) {
     return {state.realscore, sequence};
 }
 
-Action NMCS::chooseAction(const State&) {
-    static int seqIdx = 0;
-    assert(seqIdx < int(bestSequence.size()));
-    return bestSequence[seqIdx++];
+Action NMCS::chooseAction(const State& state, float timeLimit) {
+    timer.set(timeLimit);
+    timer.reset();
+
+    while (timer.isTimeLeft()) {
+        auto result = nested(state, LEVEL);
+        if (result.first > bestResult.first)
+            bestResult = result;
+    }
+
+    debug(bestResult.first);
+    assert(!bestResult.second.empty());
+    const auto bestAction = bestResult.second.front();
+    bestResult.second.erase(bestResult.second.begin());
+
+    return bestAction;
 }
 
 void NMCS::end() const {

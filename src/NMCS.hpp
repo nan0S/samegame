@@ -10,17 +10,16 @@ public:
     using Result = std::pair<int, Sequence>;
 
 public:
-    NMCS();
     void init(const State& game) override;
     Result nested(State state, int level);
     Result sample(State state);
-    Action chooseAction(const State& game) override;
+    Action chooseAction(const State& game, float timeLimit) override;
     void end() const override;
 
 private:
     static constexpr int LEVEL = 2;
-    Stoper stoper;
-    std::vector<Action> bestSequence;
+    Timer timer;
+    Result bestResult = {-1, {}};
 };
 
 #endif /* MCTS_HPP */
