@@ -1,5 +1,8 @@
 #!/bin/python
 
+# create CodinGame solution source file in C++
+# from results calculated offline
+
 import glob
 from natsort import natsorted
 

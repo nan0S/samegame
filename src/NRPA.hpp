@@ -22,8 +22,8 @@ public:
     Policy initialPolicy() const;
 
 private:
-    static constexpr int LEVEL = 0;
-    static constexpr int ITERS = 1;
+    static constexpr int LEVEL = 4;
+    static constexpr int ITERS = 10;
     static constexpr float ALPHA = 1.0;
     Timer timer;
     Result bestResult;

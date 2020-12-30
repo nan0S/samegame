@@ -32,7 +32,7 @@ NRPA::Result NRPA::nested(int level, Policy policy) {
         return playout(*initialState, policy);
 
     Result bestResult = {-1, {}};
-    for (int i = 0; i < ITERS /*&& timer.isTimeLeft()*/; ++i) {
+    for (int i = 0; i < ITERS && timer.isTimeLeft(); ++i) {
         Result result = nested(level - 1, policy);
         if (result > bestResult)
             bestResult = result;

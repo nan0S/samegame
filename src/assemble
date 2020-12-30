@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# create cpp file with offline-calculated solutions
 ./assemble.py > assembled.cpp
+# make sure it compiles
 make assembled
+# copy file to the clipboard
 clipcp assembled.cpp

@@ -17,6 +17,9 @@ exts=(
 addfiles=(
 	Makefile
 	merger
+	runtest
+	assemble
+	assemble.py
 )
 
 get_filename() {

@@ -1,5 +1,7 @@
 #include <bits/stdc++.h>
 
+/* skeleton file to be assebled from offline-calculated solutions */
+
 <#boards#>
 
 <#results#>
