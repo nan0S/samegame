@@ -10,11 +10,9 @@ public:
     using Result = std::pair<int, Sequence>;
 
 public:
-    void init(const State& game) override;
     Result nested(State state, int level);
     Result sample(State state);
     Action chooseAction(const State& game, float timeLimit) override;
-    void end() const override;
 
 private:
     static constexpr int LEVEL = 2;

@@ -77,7 +77,3 @@ Action NMCS::chooseAction(const State& state, float timeLimit) {
 
     return bestAction;
 }
-
-void NMCS::end() const {
-
-}

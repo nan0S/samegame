@@ -46,6 +46,8 @@ DEPS=(
 	BeamSearch.cpp
 	NMCS.hpp
 	NMCS.cpp
+	MCTS.hpp
+	MCTS.cpp
 	SameGame.hpp
 	main.cpp
 )

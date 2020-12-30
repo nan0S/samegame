@@ -219,40 +219,6 @@ int State::getNeighbors(Info* infos) const {
 	static bool visited[N][N];
 	std::memset(visited, 0, sizeof(visited));
 
-	// auto floodfill = [this](const int& i, const int& j){
-	// 	assert(!visited[i][j]);
-	// 	assert(canPress(i, j));
-
-	// 	std::queue<Action> q;
-	// 	q.push({i, j});
-	// 	visited[i][j] = true;
-	// 	int count = 0;
-	// 	const auto color = board[i][j];
-
-	// 	while (!q.empty()) {
-	// 		const auto [i, j] = q.front();
-	// 		q.pop();
-	// 		++count;
-
-	// 		assert(color == board[i][j]);
-	// 		assert(visited[i][j]);
-
-	// 		for (int k = 0; k < DIRC; ++k) {
-	// 			int ni = i + dx[k];
-	// 			int nj = j + dy[k];
-	// 			if (!inBounds(ni, nj) || visited[ni][nj])
-	// 				continue;
-	// 			if (color != board[ni][nj])
-	// 				continue;
-
-	// 			q.push({ni, nj});
-	// 			visited[ni][nj] = true;
-	// 		}
-	// 	}
-
-	// 	return count;
-	// };
-
 	int neighborCount = 0;
 	for (int i = 0; i < N; ++i)
 		for (int j = 0; j < N; ++j)
@@ -324,6 +290,7 @@ State::Sequence State::getActions() const {
 	static bool visited[N][N];
 	std::memset(visited, 0, sizeof(visited));
 
+	#if 1 /* color taboo policy */
 	const auto tabooColor = getTaboo();
 
 	Sequence actions;
@@ -333,7 +300,7 @@ State::Sequence State::getActions() const {
 				actions.push_back({i, j});
 				floodfill(i, j, visited);
 			}
-
+			
 	if (actions.empty())
 		for (int i = 0; i < N; ++i)
 			for (int j = 0; j < N; ++j)
@@ -342,6 +309,14 @@ State::Sequence State::getActions() const {
 					actions.push_back({i, j});
 					floodfill(i, j, visited);
 				}
+	#else /* normal policy */
+	for (int i = 0; i < N; ++i)
+		for (int j = 0; j < N; ++j)
+			if (!visited[i][j] && canPress(i, j)) {
+				actions.push_back({i, j});
+				floodfill(i, j, visited);
+			}
+	#endif
 
 	return actions;
 }

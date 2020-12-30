@@ -6,7 +6,8 @@ OBJS = main.o \
 	Action.o \
 	Strategy.o \
 	BeamSearch.o \
-	NMCS.o
+	NMCS.o \
+	MCTS.o
 
 CXX = g++
 CXXFLAGS = -std=c++17 -DLOCAL -Wall -Wextra -Wreorder -Ofast -O3 -flto -march=native -s
