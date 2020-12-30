@@ -31,14 +31,31 @@ do
     shift
 done
 
+get_test_nr() {
+    name="$1"
+    name="${name%%\.txt}"
+    nr="${name##tests/testcase}"
+    echo $nr
+}
+
+get_result_dir() {
+    testcase="$1"
+    testnr=$(get_test_nr "$testcase")
+    echo results/result$testnr.txt
+}
+
 exename="samegame"
 testdir="tests"
 
 if [ -n "$all" ]; then
     echo "Running all the tests!"
+    # make clean && make release
     for testfile in $testdir/*.txt; do
-        ./"$exename" < $testfile 
+        if [ $(get_test_nr $testfile ) -gt 20 ]; then
+            continue
+        fi
         echo $testfile
+        ./"$exename" < $testfile > $(get_result_dir "$testfile")
     done 
 else
     [ $# = 1 ] || {

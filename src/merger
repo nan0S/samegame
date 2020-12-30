@@ -48,6 +48,8 @@ DEPS=(
 	NMCS.cpp
 	MCTS.hpp
 	MCTS.cpp
+	NRPA.hpp
+	NRPA.cpp
 	SameGame.hpp
 	main.cpp
 )

@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <chrono>
+#include <random>
 
 #if defined(LOCAL) && !defined(NDEBUG)
 #define DEBUG
@@ -71,5 +72,33 @@ private:
     time_t timeLimit;
     clock_t::time_point start;
 };
+
+namespace Random {
+    extern std::mt19937 rng;
+
+    template<typename T>
+    using T_Int = std::enable_if_t<
+        std::is_integral_v<T>, T>;
+
+    template<typename T>
+    using NT_Int = std::enable_if_t<
+        !std::is_integral_v<T>, T>;
+
+    template<typename T>
+    using dist_t = std::conditional_t<
+        std::is_integral_v<T>,
+        std::uniform_int_distribution<T>,
+        std::uniform_real_distribution<T>>;
+
+    template<typename T>
+    NT_Int<T> rand() {
+        return dist_t<T>{0, 1}(rng);
+    }
+
+    template<typename T>
+    NT_Int<T> rand(T x) {
+        return dist_t<T>{0, x}(rng);
+    }
+}
 
 #endif /* COMMON_HPP */

@@ -48,10 +48,6 @@ bool State::inBounds(const int& i, const int& j) const {
 
 void State::apply(const Action& action) {
 	const auto& [i, j] = action;
-	if (!canPress(i, j)) {
-		debug(*this);
-		debug(action);
-	}
 	assert(canPress(i, j));
 
 	static bool enqueued[N][N];
@@ -290,10 +286,10 @@ State::Sequence State::getActions() const {
 	static bool visited[N][N];
 	std::memset(visited, 0, sizeof(visited));
 
+	Sequence actions;
 	#if 1 /* color taboo policy */
 	const auto tabooColor = getTaboo();
 
-	Sequence actions;
 	for (int i = 0; i < N; ++i)
 		for (int j = 0; j < N; ++j)
 			if (!visited[i][j] && board[i][j] != tabooColor && canPress(i, j)) {

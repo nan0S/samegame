@@ -1,0 +1,5 @@
+#!/bin/sh
+
+./assemble.py > assembled.cpp
+make assembled
+clipcp assembled.cpp

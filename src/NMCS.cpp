@@ -19,11 +19,13 @@ NMCS::Result NMCS::nested(State state, int level) {
         for (const auto& action : state.getActions()) {
             auto next = state;
             next.apply(action);
+
             auto result = nested(next, level - 1);
             if (result.first > currentResult.first) {
                 currentBestAction = action;
                 currentResult = result;
             }
+
             if (!timer.isTimeLeft())
                 break;
         }

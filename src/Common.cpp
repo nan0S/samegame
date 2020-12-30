@@ -16,3 +16,5 @@ bool Timer::isTimeLeft() const {
 void Timer::reset() {
     start = clock_t::now();
 }
+
+std::mt19937 Random::rng(std::random_device{}());
